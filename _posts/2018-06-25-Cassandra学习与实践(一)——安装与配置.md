@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Cassandra实践——安装与配置"
+title:  "Cassandra学习与实践(一)——安装与配置"
 date:   2018-06-25 17:00:00 +0800
 categories: jekyll update
 ---
@@ -62,7 +62,7 @@ cqlsh依赖Python 2.7。可使用python -version命令验证是否安装了正�
 
 可以在压缩包的`conf`目录中找到Cassandra的配置文件。对于软件安装包，配置文件将位于`/etc/cassandra`中
 
-
+  
 
 #### 基本配置
 
@@ -105,7 +105,7 @@ Cassandra中的大部分配置都是可以在cassandra.yaml文件中设置的
 
    意思是采用网络多数据中心策略，有两个数据中心，dc1的replica factor为3，dc2的replica factor为2
 
-
+  ​
 
 #### 目录路径
 
@@ -125,8 +125,8 @@ Cassandra中的大部分配置都是可以在cassandra.yaml文件中设置的
 
 JVM级别的设置（如堆大小）可以在`cassandra-env.sh`中设置，可以将任何其他JVM命令行参数添加到`JVM_OPTS`环境变量；当Cassandra启动时，这些参数将被传递给JVM
 
+  ​
 
-
-####日志
+#### 日志
 
 Cassandra使用的日志框架是logback，可以通过编辑`logback.xml`来更改日志记录属性。默认情况下，将`INFO`级别日志写入`system.log`文件，将`DEBUG`级别日志写入`debug.log`文件中。在前台运行时，还会将`INFO`级别日志输出到控制台
