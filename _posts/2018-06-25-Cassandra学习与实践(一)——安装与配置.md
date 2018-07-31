@@ -2,7 +2,7 @@
 layout: post
 title:  "Cassandra学习与实践(一)——安装与配置"
 date:   2018-06-25 17:00:00 +0800
-categories: jekyll update
+categories: nosql
 ---
 
 ## Overview

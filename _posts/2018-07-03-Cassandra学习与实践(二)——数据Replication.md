@@ -2,12 +2,12 @@
 layout: post
 title:  "Cassandra学习与实践(二)——数据Replication"
 date:   2018-07-03 17:00:00 +0800
-categories: jekyll update
+categories: nosql
 ---
 
 ## Replication
 
-Cassandra在多个节点存储replica来确保可靠性和容错性。Replication策略决定了replica保存到哪些节点。最长用的两种replication策略为SimpleStrategy和NetworkTopologyStrategy。
+Cassandra在多个节点存储副本来确保可靠性和容错性。Replication策略决定了副本保存到哪些节点。最长用的两种replication策略为SimpleStrategy和NetworkTopologyStrategy。
 
 
 
@@ -15,7 +15,7 @@ Cassandra在多个节点存储replica来确保可靠性和容错性。Replicatio
 
 SimpleStrategy允许定义单个整数`replication_factor`，这确定了每行数据的副本节点数。 例如，如果replication_factor为3，则表示每行数据有三个副本，每个副本保存在不同的节点上
 
-SimpleStrategy以同等方式对待所有节点，忽略每个节点的数据中心`dc`和机架`rack`配置，将Token按照从小到大的顺序，从第一个Token位置处依次取N个节点作为副本
+SimpleStrategy以同等方式对待所有节点，忽略每个节点的数据中心`dc`和机架`rack`配置，将Token按照从小到大的顺序，从第一个Token位置处依次取N个节点作为replica节点
 
 
 
@@ -31,3 +31,21 @@ NetworkTopologyStrategy允许为群集中的每个数据中心指定复制因子
 
 ## 可调节一致性
 
+Cassandra通过一致性级别支持一致性和可用性之间的每次操作权衡。一次操作的一致性级别需要指定多少副本节点响应，以认为操作成功
+
+可以使用以下一致性级别：
+
+| ONE          | 任意一个replica节点响应                          |
+| :----------- | ---------------------------------------- |
+| TWO          | 任意两个replica节点必须响应                        |
+| THREE        | 任意三个replica节点必须响应                        |
+| QUORUM       | 大多数（n / 2 + 1）replica节点必须响应              |
+| ALL          | 所有replica节点必须响应                          |
+| LOCAL_QUORUM | 本地数据中心的大多数replica节点（coordinator所在的数据中心）都必须响应 |
+| EACH_QUORUM  | 每个数据中心的大多数replica节点必须响应                  |
+| LOCAL_ONE    | 只有一个replica节点必须响应。 在多数据中心集群中，还可以保证读取请求不会发送到远程数据中心的replica节点 |
+| ANY          | 任意一个节点操作成功。如果所有的replica节点都挂了，写操作还是可以在记录一个[hinted handoff](http://www.datastax.com/documentation/cassandra/2.0/cassandra/dml/dml_about_hh_c.html#concept_ds_ifg_jqx_zj)事件之后，返回成功。如果所有的replica节点都挂了，写入的数据，在挂掉的replica节点恢复之前，读不到 |
+
+无论一致性级别如何，写入操作始终发送到所有副本。 一致性级别仅控制coordinator在响应客户端之前等待的响应时间
+
+对于读取操作，coordinator通常仅向足够的副本发出读取命令以满足一致性级别。有几个例外：
