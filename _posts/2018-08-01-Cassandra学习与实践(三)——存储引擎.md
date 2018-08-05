@@ -15,14 +15,25 @@ CommitLog是记录Cassandra节点本地所有变动（mutation）的日志。 �
 
   **注意：如果显式设置了`max_mutation_size_in_kb`，那么`commitlog_segment_size_in_mb`必须设置为`max_mutation_size_in_kb / 1024`大小的至少两倍**
 
+  ​
+
 
 - `commitlog_sync`：可以是“定期的”或“批量的”，默认为batch
+
   - `batch`：在`batch`模式下，Cassandra不会应答（ack）写操作直到commitlog写到（fsync）磁盘上。它会在fsyncs之间等待`commitlog_sync_batch_window_in_ms`毫秒。这个窗口期应保持短，因为writer线程在等待时将无法完成额外的工作。出于同样的原因，您可能需要增加`concurrent_writes`
     - `commitlog_sync_batch_window_in_ms`：在“batch”fsyncs之间等待的时间。默认值为2
   - `periodic`：在`periodic`模式下，写操作会被立即应答（ack），每`commitlog_sync_period_in_ms`毫秒都会简单地同步CommitLog
     - `commitlog_sync_period_in_ms`：在“periodic”fsyncs之间等待的时间。默认值为10000
 
+  **注意：如果发生意外关机, 则如果同步延迟, 则Cassandra可能会失去同步期间或更多的数据。如果使用 "batch" 模式, 建议将 commitlogs 存储在单独的存储设备中**
 
+  ​
+
+- `commitlog_directory`：
+
+- `commitlog_compression`：
+
+- `commitlog_total_space_in_mb`：用于在磁盘上commitlog占用的总空间
 
 
 
