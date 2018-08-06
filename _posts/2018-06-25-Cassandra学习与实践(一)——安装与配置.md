@@ -15,7 +15,7 @@ Cassandra具有持续可用性， 线性扩展性，易于管理大量服务器�
 
 Cassandra的数据模型支持非常方便的列索引，高性能的类日志结构（log-structured）数据更新, 强大的非规格化（denormalization）和物化（materialized）视图和缓存功能
 
-
+<br/>
 
 ## 安装
 
