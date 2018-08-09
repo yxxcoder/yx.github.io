@@ -91,23 +91,39 @@ SSTables是Cassandra用于在磁盘上保存数据的不可变数据文件。由
 
 #### `Data.db`
 
-实际数据, 即行的内容
+​	实际数据, 即行的内容
 
 #### `Index.db`
 
-从分区键（partition keys）到Data.db文件中的位置的索引。对于宽分区，这可能还包括分区内行的索引
+​	从分区键（partition keys）到Data.db文件中的位置的索引。对于宽分区，这可能还包括分区内行的索引
 
 #### `Summary.db`
 
-Index.db文件中每128个条目（默认情况下）的采样
+​	Index.db文件中每128个条目（默认情况下）的采样
 
 #### `Filter.db`
 
+​	SSTable中分区键（partition keys）的布隆过滤器（Bloom Filter）
+
 #### `CompressionInfo.db`
+
+​	Data.db文件中的压缩块的偏移量和长度的元数据
 
 #### `Statistics.db`
 
+​	存储SSTable相关的元数据，包括时间戳，逻辑删除（tombstones），集群key，压缩，修复，压缩，TTL等信息
+
 #### `Digest.db`
 
+​	Data.db文件的CRC-32摘要
+
 #### `TOC.txt`
+
+​	SSTable的组件文件的纯文本列表
+
+<br/>
+
+在Data.db文件中，行按分区组织。这些分区按token顺序排序（即当使用默认分区器Murmur3Partition时，通过分区键的hash）。在分区内，行按其集群key的顺序存储
+
+可以使用基于块的压缩（block-based compression）选择性地压缩SSTable
 
