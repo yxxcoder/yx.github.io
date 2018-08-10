@@ -1,8 +1,18 @@
 ---
 layout: post
 title:  "Cassandra学习与实践(N)——常见问题"
-date:   2018-08-18 17:00:00 +0800
+date:   2018-08-10 21:300:00 +0800
 categories: nosql
 ---
 
-## Overview
+### 为什么不能设置`listen_address`为0.0.0.0（监听所有地址）？
+
+​	Cassandra是一个gossip-based的分布式系统，`listen_address`是告诉其它节点访问地址，告诉别的节点说“连接我任何地址都可以”是一个糟糕的想法，如果一个集群中不同的节点使用了不同方式的地址，悲剧将会发生
+
+​	如果您不想为群集中的每个节点手动配置IP，请将其留空，Cassandra将使用`InetAddress.getLocalHost()`来选择地址。 但是要保证这个是正确的地址(/etc/hosts/, dns 等要配置对)
+
+​	JMX是个例外，默认情况下绑定到0.0.0.0 (Java bug 6425769)
+
+### Cassandra用到了哪些端口
+
+​	默认情况下，Cassandra使用7000进行集群间的通信（如果启用了SSL，则为7001），对于本地协议客户端使用9042，JMX使用7199。节点间通信和本机协议端口可在Cassandra配置文件`cassandra.yaml`中进行配置。 JMX端口可在`cassandra-env.sh`中配置（通过JVM选项）。所有端口使用的都是TCP协议
