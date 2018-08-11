@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Cassandra学习与实践(N)——常见问题"
-date:   2018-08-10 21:300:00 +0800
+date:   2018-08-10 21:30:00 +0800
 categories: nosql
 ---
 
