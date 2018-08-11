@@ -16,3 +16,8 @@ categories: nosql
 ### Cassandra用到了哪些端口
 
 ​	默认情况下，Cassandra使用7000进行集群间的通信（如果启用了SSL，则为7001），对于本地协议客户端使用9042，JMX使用7199。节点间通信和本机协议端口可在Cassandra配置文件`cassandra.yaml`中进行配置。 JMX端口可在`cassandra-env.sh`中配置（通过JVM选项）。所有端口使用的都是TCP协议
+
+### 添加新节点时，集群中的现有数据会发生什么变化
+
+当新节点加入群集时，它将自动与集群中的其他节点建立连接，并将正确的数据复制到自身节点。同样的增加、替换、移动、删除节点都是这样的。详情请参阅 [Adding, replacing, moving and removing nodes](http://cassandra.apache.org/doc/latest/operating/topo_changes.html#topology-changes)
+
