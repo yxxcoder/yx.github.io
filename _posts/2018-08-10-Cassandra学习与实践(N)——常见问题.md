@@ -21,3 +21,9 @@ categories: nosql
 
 当新节点加入群集时，它将自动与集群中的其他节点建立连接，并将正确的数据复制到自身节点。同样的增加、替换、移动、删除节点都是这样的。详情请参阅 [Adding, replacing, moving and removing nodes](http://cassandra.apache.org/doc/latest/operating/topo_changes.html#topology-changes)
 
+### 当从Cassandra删除数据时，磁盘使用率保持不变，这是为什么？
+
+写给Cassandra的数据会被持久化到SSTables。由于SSTable是不可变的，因此在执行删除操作时实际上不能删除数据，而是写入标记（也称为“逻辑删除”）以指示值的新状态。逻辑删除后执行压缩操作时，数据将被完全清除并恢复相应的磁盘空间。详情请参阅 [Compaction](http://cassandra.apache.org/doc/latest/operating/compaction.html#compaction)
+
+
+
