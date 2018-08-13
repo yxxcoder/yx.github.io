@@ -25,5 +25,14 @@ categories: nosql
 
 写给Cassandra的数据会被持久化到SSTables。由于SSTable是不可变的，因此在执行删除操作时实际上不能删除数据，而是写入标记（也称为“逻辑删除”）以指示值的新状态。逻辑删除后执行压缩操作时，数据将被完全清除并恢复相应的磁盘空间。详情请参阅 [Compaction](http://cassandra.apache.org/doc/latest/operating/compaction.html#compaction)
 
+### 为什么nodetool ring只显示一个条目，即使在节点记录中看到各个节点彼此加入了ring？
 
+当您为每个节点分配相同的令牌(token)时会发生这种情况。不要那样做。通常是因为在VM上安装Cassandra，然后将该VM克隆到其他节点造成的（特别是在使用Debian软件包时，安装后自动启动Cassandra，从而生成并保存令牌），最简单的解决方法是擦除数据和commitlog目录，从而确保每个节点在下次重启时生成随机令牌(token)
 
+### 可以更改正在运行中的Cassandra群集的副本数量（keyspace）吗
+
+可以的，但需要运行full repair（或cleanup）才能更改现有数据的副本数量：
+
+1. 更改keyspace的复制因子（ [ALTER KEYSPACE](http://cassandra.apache.org/doc/latest/cql/ddl.html#alter-keyspace-statement)）
+2. 如果要减少副本数量，请在群集上执行nodetool cleanup`以删除多余的副本数据。 需要在每一个节点执行此命令
+3. 如果要增加副本因子，请运行`nodetool repair -full`以确保根据新配置复制数据。以每个副本集为单位运行此命令。这是一个密集的过程，可能会导致不良的集群性能。 强烈建议进行滚动修复，因为试图立即修复整个集群很可能会出问题。 注意，您需要运行完整修复（`-full`）以确保不会跳过已修复的sstables
