@@ -36,3 +36,12 @@ categories: nosql
 1. 更改keyspace的复制因子（ [ALTER KEYSPACE](http://cassandra.apache.org/doc/latest/cql/ddl.html#alter-keyspace-statement)）
 2. 如果要减少副本数量，请在群集上执行nodetool cleanup`以删除多余的副本数据。 需要在每一个节点执行此命令
 3. 如果要增加副本因子，请运行`nodetool repair -full`以确保根据新配置复制数据。以每个副本集为单位运行此命令。这是一个密集的过程，可能会导致不良的集群性能。 强烈建议进行滚动修复，因为试图立即修复整个集群很可能会出问题。 注意，您需要运行完整修复（`-full`）以确保不会跳过已修复的sstables
+
+### 可以在Cassandra中存储BLOB类型数据吗
+
+Cassandra未针对大型文件或BLOB存储进行优化，并且始终会读取单个blob值并将其完全发送到客户端。因此，存储小的blob（小于1MB）应该不是问题，但建议手动将大的blob字段拆分成较小的块
+
+请特别注意，默认情况下，由于Cassandra配置文件文件的`max_mutation_size_in_kb`配置（默认为`commitlog_segment_size_in_mb`的一半，而`commitlog_segment_size_in_mb`默认为32MB），Cassandra将拒绝任何大于16MB的值
+
+
+
