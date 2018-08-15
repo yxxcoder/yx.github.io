@@ -43,5 +43,23 @@ Cassandra未针对大型文件或BLOB存储进行优化，并且始终会读取�
 
 请特别注意，默认情况下，由于Cassandra配置文件文件的`max_mutation_size_in_kb`配置（默认为`commitlog_segment_size_in_mb`的一半，而`commitlog_segment_size_in_mb`默认为32MB），Cassandra将拒绝任何大于16MB的值
 
+### 执行Nodetool命令返回“拒绝连接主机：127.0.1.1”。 这是为什么？
 
+Nodetool依赖于JMX，而JMX又依赖于RMI，而RMI又在交换的每一端根据需要设置自己的监听器和连接器。 通常所有这些都是在后台自动执行的，但是主机连接或连接到的主机连接的名称解析不正确可能导致交叉连线并出现异常
+
+如果您没有使用DNS，请确保您的`/etc/hosts`文件在两端都是争取的。 如果失败，请尝试将`cassandra-env.sh`底部附近的`-Djava.rmi.server.hostname = <public name>` JVM选项设置为可从远程计算机访问
+
+### 批量处理操作可以加速我的大容量载入吗
+
+不会。使用批量加载数据通常只会增加延迟的“尖峰”。 请改用异步的INSERT，或使用争取的Bulk Loading
+
+一个例外是将更新批处理到单个分区，这可能是一个好的做法（只要单个批处理的大小保持合理）。 但永远不要盲目地批量处理一切
+
+### 在RHEL节点上无法加入ring
+
+检查SELinux是否已打开; 如果是，请将其关闭
+
+### 如何取消订阅电子邮件列表
+
+发送电子邮件至`user-unsubscribe@cassandra.apache.org`
 
