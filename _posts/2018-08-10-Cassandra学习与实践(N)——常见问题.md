@@ -63,3 +63,6 @@ Nodetool依赖于JMX，而JMX又依赖于RMI，而RMI又在交换的每一端根
 
 发送电子邮件至`user-unsubscribe@cassandra.apache.org`
 
+### 为什么top显示Cassandra使用的内存比Java heap max多得多
+
+Cassandra在内部使用了内存映射文件（[Memory Mapped Files](https://en.wikipedia.org/wiki/Memory-mapped_file)）。也就是说，我们使用操作系统的虚拟内存系统将大量磁盘上的文件映射到Cassandra进程的地址空间
