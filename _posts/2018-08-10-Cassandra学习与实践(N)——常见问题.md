@@ -65,4 +65,8 @@ Nodetool依赖于JMX，而JMX又依赖于RMI，而RMI又在交换的每一端根
 
 ### 为什么top显示Cassandra使用的内存比Java heap max多得多
 
-Cassandra在内部使用了内存映射文件（[Memory Mapped Files](https://en.wikipedia.org/wiki/Memory-mapped_file)）。也就是说，我们使用操作系统的虚拟内存系统将大量磁盘上的文件映射到Cassandra进程的地址空间
+Cassandra在内部使用了内存映射文件（mmap，即[Memory Mapped Files](https://en.wikipedia.org/wiki/Memory-mapped_file)）。也就是说，我们使用操作系统的虚拟内存系统将大量磁盘上的文件映射到Cassandra进程的地址空间。这将“使用”虚拟内存; 如同top工具显示的那样，但在64位系统上，虚拟地址空间实际上是无限制的，所以不必担心
+
+通常意义上的“内存使用”的角度来看，主要是在`brk()`或`mmap’d/dev/zero`上分配的数据量，它们代表所使用的实际内存。 关键问题是对于mmap的文件，永远不需要保留驻留在物理内存中的数据。 因此，无论你做什么，保持驻留在物理内存中基本上只是作为缓存，与普通I/O一样将以内核页（ kernel page）缓存保留您读/写的数据
+
+mmap比IO的一个好处是只要内存里有，你里面就能读到了，不会碰到page fault(没有读系统page缓存内核做semi-context切换的开销)，详情请见[这里](http://www.varnish-cache.org/trac/wiki/ArchitectNotes)
