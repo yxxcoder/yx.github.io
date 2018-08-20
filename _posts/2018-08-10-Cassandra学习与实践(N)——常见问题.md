@@ -108,3 +108,11 @@ mmap比IO的一个好处是只要内存里有，你里面就能读到了，不�
 
 减载是Cassandra架构的一部分，如果这是一个持久性的问题，它通常是节点或集群过载的标志
 
+### Cassandra出现java.lang.OutOfMemoryError: Map failed问题导致宕机
+
+如果Cassandra节点宕机并且日志记有“Map failed”记录，则意味着操作系统拒绝java锁定更多内存。 在linux中，这通常意味着memlock是有限的。检查`/proc/<pid of cassandra>/limits`以验证并提高它（例如通过bash中的ulimit命令）。您可能还需要增加`vm.max_map_count`。 请注意，debian安装包会自动为您处理
+
+### 如果使用相同的时间戳进行两次更新会发生什么
+
+
+
