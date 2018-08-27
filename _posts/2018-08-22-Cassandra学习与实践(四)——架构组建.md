@@ -47,6 +47,41 @@ Cassandra使用Gossip协议去获得集群中其他节点的位置和状态信�
 - 每个数据中心三个副本：这种配置允许每个副本组出现单点故障，同时保证本地读取的一致性水平为LOCAL_QUORUM。或者多个副本组出现多节点故障，同时保证本地读取的一致性水平为ONE
 
 
+<br>
+
+### 分区器的概念
+
+我们存储的数据是如何对应到相应的虚拟节点的呢？分区器决定了数据如何在集群内被分发。简单来说，一个分区器就是一个用来计算partition key哈希值的一个哈希函数。每一行数据由partition key的值唯一标识，并且根据partition key的哈希值决定如何在集群内被分发
+
+#### Cassandra提供了以下这些分区器
+
+- Murmur3Partitioner（默认）：基于MurmurHash哈希算法
+- RandomPartitioner：基于MD5哈希算法
+- ByteOrderedPartitioner：根据partition key的bytes进行有序分区
+
+#### Murmur3Partitioner：基于MurmurHash哈希算法
+
+Murmur3Partitioner和RandomPartitioner都使用哈希值来平均分配一个column family的数据到集群上的所有节点。Murmur3Partitioner使用MurmurHash函数，MurmurHash哈希函数为每个行键值创建了64byte的哈希值。哈希数值的范围从 -2<sup>63</sup> 到 2<sup>63</sup> 
+
+#### RandomPartitioner：基于MD5哈希算法
+
+RandomPartitioner是Cassandra 1.2之前的默认分页器。RandomPartitioner分发数据使用MD5哈希函数计算行键值，数值范围从 0 到 2<sup>127</sup> -1
+
+#### ByteOrderedPartitioner：根据partition key的bytes进行有序分区
+
+ByteOrderedPartitioner用于基于partition key的bytes进行有序分区。它允许按照partition key进行条件范围查询。也就是说，可以像关系型数据库的主键那样，通过游标，有序遍历所有的partition key。例如，如果使用用户名作为partition key，可以范围查询所有名字在Jake和Jeo之间的用户。这样的条件范围查询，在使用随机分区器时，是不允许的
+
+尽管范围查询听上去很有吸引力，**并不推荐使用有序的分区器，因为：**
+
+- 负载均衡更困难
+- 顺序的分区容易造成热点（hotspot）
+- 多表时负载不均衡
+
+
+<br>
+
+### 告密者（Snitch）
+
 
 
 
