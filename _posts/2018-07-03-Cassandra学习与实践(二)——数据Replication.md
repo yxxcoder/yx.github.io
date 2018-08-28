@@ -5,6 +5,8 @@ date:   2018-07-03 17:00:00 +0800
 categories: nosql
 ---
 
+*本文译自Cassandra官方文档：http://cassandra.apache.org/doc/latest/architecture/dynamo.html#replication*
+
 ## Replication
 
 Cassandra在多个节点存储副本来确保可靠性和容错性。Replication策略决定了副本保存到哪些节点。最长用的两种replication策略为SimpleStrategy和NetworkTopologyStrategy。

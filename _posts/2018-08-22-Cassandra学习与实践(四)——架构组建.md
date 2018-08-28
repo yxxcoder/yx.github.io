@@ -82,7 +82,7 @@ ByteOrderedPartitioner用于基于partition key的bytes进行有序分区。它�
 
 ### 告密者（Snitch）
 
-
+Snitch决定应当从哪个数据中心和机架写入和读取数据
 
 
 
