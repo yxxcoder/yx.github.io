@@ -82,7 +82,17 @@ ByteOrderedPartitioner用于基于partition key的bytes进行有序分区。它�
 
 ### 告密者（Snitch）
 
-Snitch决定应当从哪个数据中心和机架写入和读取数据
+Snitch是用来告诉Cassandra网络的拓扑结构，比如节点之间的相对距离，节点的如何分组，节点所在的rack，从而对用户请求可以进行高效的路由。注意：一个集群中的所有的节点都必须采用相同的Snitch策略
+
+#### Dynamic snitching
+
+默认所有的snitch都使用了一个动态snitch层，用来监控读请求，当发现有延迟的时候，把请求转发到其他性能比较好的节点
+
+#### Snitch classes
+
+cassandra.yaml中的`endpoint_snitch`参数应设置为实现IEndPointSnitch的类，该类将由dynamic snitch包装，并确定两个端点是在同一个数据中心还是在同一个机架上。 开箱即用，Cassandra提供了snitch实现：
+
+- `SimpleSnitch`：
 
 
 
