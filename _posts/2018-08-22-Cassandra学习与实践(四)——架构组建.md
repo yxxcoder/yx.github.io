@@ -7,9 +7,13 @@ categories: nosql
 
 ### 什么是Gossip协议
 
-Cassandra使用Gossip协议去获得集群中其他节点的位置和状态信息。Gossip是一个点对点的通信协议，在这个协议中，节点之间定期交换状态信息。Gossip协议每隔一秒运行一次，节点和不超过三个节点交换信息。在交换的信息中，旧的信息会被新的信息覆盖。在同一个cluster集群中应该使用相同的seed节点列表
+Cassandra 是无中心化的，每一个节点都可能担任临时协调者角色，也可能担任数据备份角色，这也意味着所有节点没有差异，也不会存在差异，因为所有行为都是按照规则约束的随机行为
 
-当一个节点启动的时候，它会去读取配置文件`cassandra.yaml`从而决定它属于哪个集群，从那个节点获得集群中其他节点的信息以及一些其他的的参数：
+为了支持无中心化和分区容错，Cassandra 使用 gossip 协议允许每个节点追踪集群里其他节点的状态信息
+
+Gossip 协议（也叫八卦协议）通常假设在大型、无中心化的网络系统中容易出现网络故障，也被用于分布式数据库内的自动备份机制。本身它的名称就来源于人类的八卦行为，你可以和任何人交换互相感兴趣的信息。Gossip 比较适合在没有很高一致性要求的场景中用作信息的同步。信息达到同步的时间大概是 log(N)，这个 N 表示节点的数量。Gossip协议每隔一秒运行一次，每次和三个节点交换信息。Gossip 中的每个节点维护一组状态，状态可以用一个 key/value 对表示，还附带了一个版本号，版本号大的为更新的状态
+
+在同一个cluster集群中应该使用相同的seed节点列表。当一个节点启动的时候，它会去读取配置文件`cassandra.yaml`从而决定它属于哪个集群，从那个节点获得集群中其他节点的信息以及一些其他的的参数：
 
 - `cluster_name`：当前节点所属的Cassandra集群的名称，集群中每一个节点的集群名应该是一样的
 - `listen_address`：当前节点的ip地址或主机名，使得其他节点能够联系到这个节点。这个地址应该是公共地址，而不是localhost
@@ -82,7 +86,9 @@ ByteOrderedPartitioner用于基于partition key的bytes进行有序分区。它�
 
 ### 告密者（Snitch）
 
-Snitch是用来告诉Cassandra网络的拓扑结构，比如节点之间的相对距离，节点的如何分组，节点所在的rack，从而对用户请求可以进行高效的路由。注意：一个集群中的所有的节点都必须采用相同的Snitch策略
+Cassandra 采用一个叫做 snitches（告密者）的办法决定集群内部每个节点的相对主机距离，用来决定哪一个节点被用来读和写。Snitches 收集整个网络拓扑信息，这样 cassandra 可以有效地路由请求。注意：一个集群中的所有的节点都必须采用相同的Snitch策略
+
+当 Cassandra 发起一个读请求，它需要通过设定的一致性级别与几个备份交互。为了提供读请求的最大速度，Cassandra 选择一个单一的副本用于整个对象的查询，并且要求额外的副本执行 hash 值，用于确保拿到请求数据的最新版本。Snitch 的角色是去帮助确认哪个副本会最快地返回，并且这个副本需要包含查询的所有数据
 
 #### Dynamic snitching
 
@@ -92,11 +98,12 @@ Snitch是用来告诉Cassandra网络的拓扑结构，比如节点之间的相�
 
 cassandra.yaml中的`endpoint_snitch`参数应设置为实现IEndPointSnitch的类，该类将由dynamic snitch包装，并确定两个端点是在同一个数据中心还是在同一个机架上。 开箱即用，Cassandra提供了snitch实现：
 
-- `SimpleSnitch`：
-
-
-
-
+- `SimpleSnitch`：SimpleSnitch是默认使用的snitch，主要用于一个数据中心的情况下。不考虑数据中心和机架的具体信息。 策略顺序为接近，当忽略读修复时可以提高缓存局部性
+- `GossipingPropertyFileSnitch`：生产环境推荐使用。本地节点的机架和数据中心在`cassandra-rackdc.properties`中定义，通过gossip协议传播到其他节点。 如果存在`cassandra-topology.properties`，则将其用作后备，允许从PropertyFileSnitch迁移
+- `PropertyFileSnitch`：可以在`cassandra-topology.properties`文件中显性配置数据中心和机架的位置信息，这种方式最灵活
+- `Ec2Snitch`：将一个简单的集群部署在亚马逊的EC2可以使用Ec2Snitch。这种方式适用于单区域的EC2部署。通过EC2 API加载Region和Availability Zone的信息。Region可视为数据中心，Availability Zone可视为机架。仅适用私有IP，因此这不适用于多个区域
+- `Ec2MultiRegionSnitch`：使用公共IP作为broadcast_address以允许跨区域连接（因此，您也应该将种子节点`seed`设置为公共IP）。您需要在公共IP的防火墙上打开`storage_port`或`ssl_storage_port`（对于区域内流量，Cassandra将在建立连接后切换到专用IP）
+- `RackInferringSnitch`：接近度由机架和数据中心决定，每个节点的IP地址的第二段对应数据中心，第三段对应机架（如192.168.188.101和192.168.199.102认为是一个数据中心的节点，192.168.188.101和192.168.188.102认为是同一个机架的节点）。除非这种情况符合您的部署约定，否则这最好用作编写自定义Snitch类的示例
 
 
 
