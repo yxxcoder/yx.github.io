@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Cassandra学习与实践(二)——数据Replication"
+title:  "Cassandra学习与实践(四)——数据Replication"
 date:   2018-07-03 17:00:00 +0800
 categories: nosql
 ---
