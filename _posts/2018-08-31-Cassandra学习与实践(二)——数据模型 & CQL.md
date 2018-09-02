@@ -74,11 +74,41 @@ Cassandra在定义列族时，可以包含一个名为CompareWith的元素，这
 
 ## CQL
 
+CQL是Cassandra Query Language的简称，CQL由类似SQL的语句组成，包括修改，查询，保存，变更数据的存储方式等等功能。每一行语句由分号（;）结束，例如：
 
+```CQL
+SELECT * FROM MyTable;
 
+UPDATE MyTable SET SomeColumn = 'SomeValue' WHERE columnName = 'Something Else';
+```
 
+CQL的关键字是忽略大小写的，除非用双引号括起来，才是大小写敏感的。如果不用双引号括起来，即使CQL写成大写，也会被保存为小写。定义Tables、Column、KeySpace等不可以直接使用Cassandra保留字，如果一定要用可以使用双引号引用
 
+```CQL
+CREATE TABLE test(
 
+	Foo int PRIMARY KEY,
+
+	"Bar" int
+
+);
+```
+
+<br>
+
+CQL数据定义语句主要是CREATE、DROP、ALTER，具体包括如下几点：
+
+```CQL
+CREATE KEYSPACE/TABLE/INDEX/TRIGGER/TYPE
+
+USE KEYSPACE
+
+ALTER KEYSPACE/TABLE/INDEX/TRIGGER/TYPE
+
+DROP KEYSPACE/TABLE/INDEX/TRIGGER/TYPE
+```
+
+<br>
 
 
 
