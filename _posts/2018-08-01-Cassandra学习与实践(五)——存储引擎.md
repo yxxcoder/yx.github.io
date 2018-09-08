@@ -7,6 +7,8 @@ categories: nosql
 
 *本文译自Cassandra官方文档：http://cassandra.apache.org/doc/latest/architecture/storage_engine.html*
 
+
+
 ## CommitLog
 
 CommitLog是记录Cassandra节点本地所有变动（mutation）的日志。 写入Cassandra的任何数据在写入memtable之前都将首先写入CommitLog日志。 这在意外关闭的情况下提供了耐久性。 启动时，提交日志中的任何变动（mutation）都将应用到memtables

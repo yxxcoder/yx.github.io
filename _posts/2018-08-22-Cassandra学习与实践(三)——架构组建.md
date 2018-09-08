@@ -5,6 +5,16 @@ date:   2018-08-22 22:00:00 +0800
 categories: nosql
 ---
 
+*参考资料：*
+
+*极客学院：http://www.jikexueyuan.com*
+
+*Cassandra官方文档：http://cassandra.apache.org/doc/latest/faq/index.html*
+
+*学习Cassandra：https://teddyma.gitbooks.io/learncassandra_cn/content/*
+
+
+
 ### 什么是Gossip协议
 
 Cassandra 是无中心化的，每一个节点都可能担任临时协调者角色，也可能担任数据备份角色，这也意味着所有节点没有差异，也不会存在差异，因为所有行为都是按照规则约束的随机行为

@@ -7,6 +7,8 @@ categories: nosql
 
 *本文译自Cassandra官方文档：http://cassandra.apache.org/doc/latest/faq/index.html*
 
+
+
 ### 为什么不能设置`listen_address`为0.0.0.0（监听所有地址）？
 
 ​	Cassandra是一个gossip-based的分布式系统，`listen_address`是告诉其它节点访问地址，告诉别的节点说“连接我任何地址都可以”是一个糟糕的想法，如果一个集群中不同的节点使用了不同方式的地址，悲剧将会发生
