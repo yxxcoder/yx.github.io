@@ -13,7 +13,7 @@ categories: nosql
 
 *学习Cassandra：https://teddyma.gitbooks.io/learncassandra_cn/content/*
 
-
+<br>
 
 ## 如何连接到一个数据节点
 
@@ -45,7 +45,15 @@ Cluster cluster = Cluster
 
 ### Load Balancing Policies
 
+默认情况下，一个客户端的Cluster实例管理了集群中所有节点的连接，并且，将客户端请求随机连接到任意节点。不过，在某些情况下，尤其是多数据中心时，默认行为的性能可能不是最优的
 
+例如，如果集群包含两个数据中心，一个在中国，一个在美国。如果客户端在中国，那么，应该避免直接连接美国的节点，不然太慢
+
+Cluster实例的Load balancing policies设置，决定了，客户端请求如何分配节点的连接
+
+Datastax driver中最常用的内置Load balancing policies是`DCAwareLoadBalancePolicy`，它可以指定客户端请求只连接到指定的数据中心的节点
+
+当然，也可以实现自定义的load balanacing policies，实现自定义的客户端连接分配
 
 
 

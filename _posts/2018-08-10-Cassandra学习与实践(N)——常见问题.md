@@ -7,7 +7,7 @@ categories: nosql
 
 *本文译自Cassandra官方文档：http://cassandra.apache.org/doc/latest/faq/index.html*
 
-
+<br>
 
 ### 为什么不能设置`listen_address`为0.0.0.0（监听所有地址）？
 

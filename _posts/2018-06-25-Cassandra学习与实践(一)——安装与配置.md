@@ -9,7 +9,7 @@ categories: nosql
 
 *Cassandra官方文档：http://cassandra.apache.org/doc/latest/faq/index.html*
 
-
+<br>
 
 ## Overview
 

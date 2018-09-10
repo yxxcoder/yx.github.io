@@ -7,7 +7,7 @@ categories: nosql
 
 *本文译自Cassandra官方文档：http://cassandra.apache.org/doc/latest/architecture/storage_engine.html*
 
-
+<br>
 
 ## CommitLog
 
