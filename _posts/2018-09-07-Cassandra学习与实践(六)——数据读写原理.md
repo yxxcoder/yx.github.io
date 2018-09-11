@@ -5,13 +5,14 @@ date:   2018-09-07 12:00:00 +0800
 categories: nosql
 ---
 
-*参考资料：*
+#### *参考资料*
 
-*极客学院：http://www.jikexueyuan.com*
+- *极客学院 [http://www.jikexueyuan.com](http://www.jikexueyuan.com)*
 
-*Cassandra官方文档：http://cassandra.apache.org/doc/latest/faq/index.html*
+- *Cassandra官方文档 [http://cassandra.apache.org/doc/latest/faq/index.html](http://cassandra.apache.org/doc/latest/faq/index.html)*
 
-*学习Cassandra：https://teddyma.gitbooks.io/learncassandra_cn/content/*
+- *学习Cassandra [https://teddyma.gitbooks.io/learncassandra_cn/content/](https://teddyma.gitbooks.io/learncassandra_cn/content/)*
+
 
 <br>
 
@@ -41,7 +42,7 @@ Cluster cluster = Cluster
  Session session = cluster.connect();
 ```
 
-
+<br>
 
 ### Load Balancing Policies
 
@@ -54,6 +55,8 @@ Cluster实例的Load balancing policies设置，决定了，客户端请求如�
 Datastax driver中最常用的内置Load balancing policies是`DCAwareLoadBalancePolicy`，它可以指定客户端请求只连接到指定的数据中心的节点
 
 当然，也可以实现自定义的load balanacing policies，实现自定义的客户端连接分配
+
+<br>
 
 
 

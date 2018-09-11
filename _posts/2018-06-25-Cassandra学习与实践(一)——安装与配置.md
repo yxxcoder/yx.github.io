@@ -5,9 +5,9 @@ date:   2018-06-25 17:00:00 +0800
 categories: nosql
 ---
 
-*参考资料：*
+#### 参考资料
 
-*Cassandra官方文档：http://cassandra.apache.org/doc/latest/faq/index.html*
+- *Cassandra官方文档 [http://cassandra.apache.org/doc/latest/faq/index.html](http://cassandra.apache.org/doc/latest/faq/index.html)*
 
 <br>
 
