@@ -58,11 +58,19 @@ Datastax driver中最常用的内置Load balancing policies是`DCAwareLoadBalanc
 
 <br>
 
+## 数据如何写入到一个数据节点
 
+如果所有的节点在同一个数据中心，coordinator会将写请求发到所有的replica。如果所有的replica节点可用，无论客户端指定的[consistency level](https://yxxcoder.github.io/nosql/2018/07/03/Cassandra%E5%AD%A6%E4%B9%A0%E4%B8%8E%E5%AE%9E%E8%B7%B5(%E5%9B%9B)-%E6%95%B0%E6%8D%AEReplication.html)是什么，每一个replica都会处理写请求。写操作的consistency level只决定了coordinator在通知客户端写操作成功之前，多少个replica节点必须返回成功
 
+例如，一个单数据中心集群有10个节点，replication factor值为3，一个写请求，会被发给所有的三个replica节点。如果，客户端指定的consistency level是ONE，那么，只要任何一个replica节点通知coordinator写成功，coordinator就会返回客户端写成功。一个节点返回写成功，表示，写数据已经保存到这个节点的内存中的memtable和磁盘上的commit log
 
+![column](https://yxxcoder.github.io/images/单数据中心.png)
 
+如果是多数据中心部署，Cassandra为了优化写性能，对于远程数据中心，会在每个远程数据中心的节点中，选择一个作为远程数据中心中的coordinator。因此，和远程数据中心里的replica nodes的通信，本地数据中心的coordinator，只需要和每个远程数据中心的这一个coordinator节点通信。
 
+如果使用consistency level ONE或者LOCAL_QUORUM，coordinator只需要和本地数据中心的节点通信。因此，可以避免，跨数据中心的的通信影响写操作性能
+
+![column](https://yxxcoder.github.io/images/双数据中心.png)
 
 
 
