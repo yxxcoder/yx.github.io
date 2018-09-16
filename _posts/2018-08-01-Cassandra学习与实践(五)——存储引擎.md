@@ -15,7 +15,7 @@ CommitLog是记录Cassandra节点本地所有变动（mutation）的日志。 �
 
 所有数据写入操作都通过存储在commitlog段中进行优化，从而减少了写入磁盘所需的查找次数。Commitlog Segments受`commitlog_segment_size_in_mb`选项的限制，一旦达到大小，就会创建一个新的commitlog段。当所有数据刷新到SSTable后，Commitlog中的数据可以归档，删除或回收。当Cassandra当前写的数据的时间早于SSTables中的数据时，Commitlog会被截断。 在停止Cassandra之前运行`nodetool drain`会将memtables中的所有内容写入SSTables，并且无需在启动时与commitlogs同步
 
-
+![column](https://yxxcoder.github.io/images/read_data.png)
 
 - `commitlog_segment_size_in_mb`：默认大小为32，这在大多数场景下是没问题的，但是如果要存档commitlog（请参阅commitlog_archiving.properties），那么你可能需要更精细的归档粒度；8 or 16 MB 是合理的。最大的变动（mutation）大小也可通过cassandra.yaml中的`max_mutation_size_in_kb`设置进行配置。默认值为`commitlog_segment_size_in_mb * 1024`的一半
 
