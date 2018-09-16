@@ -88,24 +88,36 @@ Datastax driver中最常用的内置Load balancing policies是`DCAwareLoadBalanc
 
 ### 单数据中心，consistency level ONE
 
+如果是单数据中心，replication factor值为3，读操作consistency level为ONE，coordinator访问并返回最近的replica返回的数据。在后台，其他两台replica的数据也会被检查，确保该行数据的最新版本在所有replica的一致性
+
 ![column](https://yxxcoder.github.io/images/singleDCConOne.svg)
 
 ### 双数据中心，consistency level QUORUM
+
+如果是双数据中心，replication factor值为3，读操作consistency level为QUORUM，coordinator必须等待4个replica返回数据。4个replica可以来自任意数据中心。在后台，其他所有数据中心的replica的数据也会被检查，确保该行数据的最新版本在所有replica的一致性
 
 ![column](https://yxxcoder.github.io/images/multipleDCConQuorum.svg)
 
 ### 双数据中心，consistency level LOCAL_QUORUM
 
+如果是双数据中心，replication factor值为3，读操作consistency level为LOCAL_QUORUM, coordinator必须等待本地数据中心的2个replica返回数据。在后台，其他所有数据中心的replica的数据也会被检查，确保该行数据的最新版本在所有replica的一致性
+
 ![column](https://yxxcoder.github.io/images/multipleDCConLocalQuorum.svg)
 
 ### 双数据中心，consistency level ONE
+
+如果是双数据中心，replication factor值为3，读操作consistency level为ONE, coordinator访问并返回最近的replica返回的数据，无论该replica是本地数据中心的还是远程数据中心的。在后台，其他所有数据中心的replica的数据也会被检查，确保该行数据的最新版本在所有replica的一致性
 
 ![column](https://yxxcoder.github.io/images/multipleDCConOne.svg)
 
 ### 双数据中心，consistency level LOCAL_ONE
 
+如果是双数据中心，replication factor值为3，读操作consistency level为LOCAL_ONE，coordinator访问并返回本地数据中心最近的replica返回的数据。在后台，其他所有数据中心的replica的数据也会被检查，确保该行数据的最新版本在所有replica的一致性
+
 ![column](https://yxxcoder.github.io/images/multipleDCConLocalOne.svg)
 
 ### 使用speculative_retry做快速读保护（Rapid read protection）
+
+快速读保护允许，即使coordinator最开始选择的replica节点down了或者超时了，依然能返回数据。如果一个表配置了speculative_retry参数，假如coordinator最先选择的replica读取超时，coordinator会尝试读取其他可用的replica代替
 
 ![column](https://yxxcoder.github.io/images/rapidReadProtection.svg)
