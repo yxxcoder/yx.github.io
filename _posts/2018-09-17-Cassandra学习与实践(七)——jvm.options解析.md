@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Cassandra学习与实践(七)——Cassandra-env.sh解析"
+title:  "Cassandra学习与实践(七)——jvm.options解析"
 date:   2018-09-17 12:00:00 +0800
 categories: nosql
 ---
