@@ -39,30 +39,37 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 # 取消以下任何属性的注释可启用特定的启动参数
 
 # In a multi-instance deployment, multiple Cassandra instances will independently assume that all
-# CPU processors are available to it. This setting allows you to specify a smaller set of processors
-# and perhaps have affinity.
+# 在多实例部署中，假设多个Cassandra实例会独立的部署
+# CPU processors are available to it. This setting allows you to specify a smaller set of processors and perhaps have affinity.
+# CPU处理器可用。此设置允许您指定较小的处理器集以有更好的兼容
 #-Dcassandra.available_processors=number_of_processors
 
 # The directory location of the cassandra.yaml file.
+# 指定cassandra.yaml配置文件的位置，注释的话默认在同一个文件夹内
 #-Dcassandra.config=directory
 
 # Sets the initial partitioner token for a node the first time the node is started.
+# 在第一次启动Cassandra节点时为节点设置初始的partitioner token ???
 #-Dcassandra.initial_token=token
 
 # Set to false to start Cassandra on a node but not have the node join the cluster.
+# 设置为false以在节点上启动Cassandra但不让节点加入群集
 #-Dcassandra.join_ring=true|false
 
-# Set to false to clear all gossip state for the node on restart. Use when you have changed node
-# information in cassandra.yaml (such as listen_address).
+# Set to false to clear all gossip state for the node on restart. Use when you have changed node information in cassandra.yaml (such as listen_address).
+# 设置为false会在节点重新启动时更新节点的所有gossip状态。在cassandra.yaml中更改节点信息时使用（例如listen_address）
 #-Dcassandra.load_ring_state=true|false
 
 # Enable pluggable metrics reporter. See Pluggable metrics reporting in Cassandra 2.0.2.
+# 启用可插入指标报告器。请参阅Cassandra 2.0.2中的可插入指标报告
 #-Dcassandra.metricsReporterConfigFile=file
 
 # Set the port on which the CQL native transport listens for clients. (Default: 9042)
+# 设置CQL本机传输侦听客户端的端口。（默认：9042）
 #-Dcassandra.native_transport_port=port
 
 # Overrides the partitioner. (Default: org.apache.cassandra.dht.Murmur3Partitioner)
+# 覆盖partitioner （默认：org.apache.cassandra.dht.Murmur3Partitioner）
 #-Dcassandra.partitioner=partitioner
 
 # To replace a node that has died, restart a new node in its place specifying the address of the
