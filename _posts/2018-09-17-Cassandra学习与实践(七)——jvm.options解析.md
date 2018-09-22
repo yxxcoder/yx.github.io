@@ -72,9 +72,8 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 # 覆盖partitioner （默认：org.apache.cassandra.dht.Murmur3Partitioner）
 #-Dcassandra.partitioner=partitioner
 
-# To replace a node that has died, restart a new node in its place specifying the address of the
-# dead node. The new node must not have any data in its data directory, that is, it must be in the
-# same state as before bootstrapping.
+# To replace a node that has died, restart a new node in its place specifying the address of the dead node. The new node must not have any data in its data directory, that is, it must be in the same state as before bootstrapping.
+# 如果要替换已宕机的节点，请在启动时指定宕机节点的ip地址。新节点的数据目录中不得包含任何数据，也就是说，它必须处于引导前的状态
 #-Dcassandra.replace_address=listen_address or broadcast_address of dead node
 
 # Allow restoring specific tables from an archived commit log.
