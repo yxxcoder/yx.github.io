@@ -77,16 +77,19 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 #-Dcassandra.replace_address=listen_address or broadcast_address of dead node
 
 # Allow restoring specific tables from an archived commit log.
+# 允许从归档的commit log中恢复特定的表
 #-Dcassandra.replayList=table
 
-# Allows overriding of the default RING_DELAY (30000ms), which is the amount of time a node waits
-# before joining the ring.
+# Allows overriding of the default RING_DELAY (30000ms), which is the amount of time a node waits before joining the ring.
+# 节点在加入环之前等待的时间，默认的RING_DELAY为30000ms
 #-Dcassandra.ring_delay_ms=ms
 
 # Set the port for the Thrift RPC service, which is used for client connections. (Default: 9160)
+# 用于客户端连接的Thrift RPC服务端口，默认：9160
 #-Dcassandra.rpc_port=port
 
 # Set the SSL port for encrypted communication. (Default: 7001)
+# 加密通信的SSL端口，默认：7001
 #-Dcassandra.ssl_storage_port=port
 
 # Enable or disable the native transport server. See start_native_transport in cassandra.yaml.
