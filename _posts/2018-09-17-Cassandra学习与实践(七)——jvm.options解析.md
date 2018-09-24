@@ -93,29 +93,32 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 #-Dcassandra.ssl_storage_port=port
 
 # Enable or disable the native transport server. See start_native_transport in cassandra.yaml.
+# 启用或禁用本地传输服务器。见start_native_transport在cassandra.yaml，默认：true
+# 绑定的地址与cassandra.yaml中的rpc_address相同，端口是不同的，通过native_transport_port指定，默认为9042
 # cassandra.start_native_transport=true|false
 
 # Enable or disable the Thrift RPC server. (Default: true)
+# 启用或禁用Thrift RPC服务，默认：true
 #-Dcassandra.start_rpc=true/false
 
 # Set the port for inter-node communication. (Default: 7000)
+# 节点间通信的端口，默认：7000
 #-Dcassandra.storage_port=port
 
 # Set the default location for the trigger JARs. (Default: conf/triggers)
+# 设置触发器JAR的默认位置
 #-Dcassandra.triggers_dir=directory
 
-# For testing new compaction and compression strategies. It allows you to experiment with different
-# strategies and benchmark write performance differences without affecting the production workload. 
+# For testing new compaction and compression strategies. It allows you to experiment with different strategies and benchmark write performance differences without affecting the production workload. 
+# 启用测试新压缩和压缩策略，允许您在不影响生产工作负载的情况下尝试不同的策略和基准写入性能差异。请参阅测试压实和压缩
 #-Dcassandra.write_survey=true
 
-# To disable configuration via JMX of auth caches (such as those for credentials, permissions and
-# roles). This will mean those config options can only be set (persistently) in cassandra.yaml
-# and will require a restart for new values to take effect.
+# To disable configuration via JMX of auth caches (such as those for credentials, permissions and roles). This will mean those config options can only be set (persistently) in cassandra.yaml and will require a restart for new values to take effect.
+# 禁用JMX身份验证缓存（例如凭据，权限和角色的配置），这意味着那些配置选项只能在cassandra.yaml中设置（持久），并且需要重新启动才能使新值生效
 #-Dcassandra.disable_auth_caches_remote_configuration=true
 
-# To disable dynamic calculation of the page size used when indexing an entire partition (during
-# initial index build/rebuild). If set to true, the page size will be fixed to the default of
-# 10000 rows per page.
+# To disable dynamic calculation of the page size used when indexing an entire partition (during initial index build/rebuild). If set to true, the page size will be fixed to the default of 10000 rows per page.
+# 禁用动态计算页面大小当索引整个分区时（在初始索引构建/重建期间）。如果设置为true，则页面大小将固定为每页10000行的默认值
 #-Dcassandra.force_default_indexing_page_size=true
 
 ########################
