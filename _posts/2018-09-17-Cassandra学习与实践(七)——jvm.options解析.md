@@ -123,24 +123,30 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 
 ########################
 # GENERAL JVM SETTINGS #
+# 通用JVM设置           #
 ########################
 
 # enable assertions. highly suggested for correct application functionality.
+# 启用断言。强烈建议正确使用应用程序的功能
+# 从JDK1.4开始，java可支持断言机制，用于诊断运行时问题。通常在测试阶段使断言有效，在正式运行时不需要运行断言。断言后的表达式的值是一个逻辑值，为true时断言不运行，为false时断言运行，抛出java.lang.AssertionError错误。缺省时虚拟机关闭断言机制，用-ea可打开断言机制
 -ea
 
-# enable thread priorities, primarily so we can give periodic tasks
-# a lower priority to avoid interfering with client workload
+# enable thread priorities, primarily so we can give periodic tasks a lower priority to avoid interfering with client workload
+# 启用线程优先级，主要是因为我们可以为周期性任务提供较低的优先级，以避免干扰客户端工作负载
 -XX:+UseThreadPriorities
 
 # allows lowering thread priority without being root on linux - probably
 # not necessary on Windows but doesn't harm anything.
 # see http://tech.stolsvik.com/2010/01/linux-java-thread-priorities-workar
+# 非linux的root用户时允许降低线程优先级 - 可能在Windows上不是必需的但不会损害任何东西
 -XX:ThreadPriorityPolicy=42
 
 # Enable heap-dump if there's an OOM
+# 发生内存溢出时导出dump文件
 -XX:+HeapDumpOnOutOfMemoryError
 
 # Per-thread stack size.
+# 每个线程的堆栈大小
 -Xss256k
 
 # Larger interned string table, for gossip's benefit (CASSANDRA-6410)
