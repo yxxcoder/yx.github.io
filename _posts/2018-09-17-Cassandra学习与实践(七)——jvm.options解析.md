@@ -150,6 +150,7 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 -Xss256k
 
 # Larger interned string table, for gossip's benefit (CASSANDRA-6410)
+# 更大的字符串表，对于gossip协议有好处???
 -XX:StringTableSize=1000003
 
 # Make sure all memory is faulted and zeroed on startup.
