@@ -150,15 +150,23 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 -Xss256k
 
 # Larger interned string table, for gossip's benefit (CASSANDRA-6410)
-# 更大的字符串表，对于gossip协议有好处???
+# 更大的StringTable，对gossip协议有好处
+# String.intern()被调用时会往Hashtable插入一个String（若该String不存在），这里的Table就是StringTable，此参数就是这个StringTable的大小
 -XX:StringTableSize=1000003
 
 # Make sure all memory is faulted and zeroed on startup.
 # This helps prevent soft faults in containers and makes
 # transparent hugepage allocation more effective.
+# JAVA进程启动的时候,虽然我们可以为JVM指定合适的内存大小,但是这些内存操作系统并没有真正的分配给JVM,而是等JVM访问这些内存的时候,才真正分配,这样会造成以下问题
+# 1. GC的时候,新生代的对象要晋升到老年代的时候,需要内存,这个时候操作系统才真正分配内存,这样就会加大young gc的停顿时间;
+# 2. 可能存在内存碎片的问题
+# 可以在JVM启动的时候,配置-XX:+AlwaysPreTouch参数,这样JVM就会先访问所有分配给它的内存,让操作系统把内存真正的分配给JVM.后续JVM就可以顺畅的访问内存了
 -XX:+AlwaysPreTouch
 
 # Disable biased locking as it does not benefit Cassandra.
+# 禁用偏向锁, 因为它对Cassandra没有好处
+# 偏向锁的目的是为了在无锁竞争的情况下避免在锁获取过程中执行不必要的CAS原子指令；现有的CAS原子指令虽然相对于重量级锁来说开销比较小但还是存在非常可观的本地延迟。而偏向锁则针对拥有当前锁的线程，允许其在竞争不存在的情况下，直接进入同步的代码块，无需同步操作，从而获取了相当的性能提升
+# 在偏向锁的应用场景主要集中在竞争不激烈的情况下，通过使用偏向锁可以减少其在CAS操作下的同步性能消耗，从而获取性能的提升。关键点在于是否存在激烈的锁竞争，如果存在则不适合使用它。默认情况下是被打开的
 -XX:-UseBiasedLocking
 
 # Enable thread-local allocation blocks and allow the JVM to automatically
