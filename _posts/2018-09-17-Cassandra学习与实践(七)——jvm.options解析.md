@@ -171,6 +171,7 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 
 # Enable thread-local allocation blocks and allow the JVM to automatically
 # resize them at runtime.
+# 启用线程局部分配块，并允许JVM在运行时自动调整它们的大小
 -XX:+UseTLAB
 -XX:+ResizeTLAB
 -XX:+UseNUMA
