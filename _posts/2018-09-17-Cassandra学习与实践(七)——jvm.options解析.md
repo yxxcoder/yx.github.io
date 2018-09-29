@@ -172,16 +172,20 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 # Enable thread-local allocation blocks and allow the JVM to automatically
 # resize them at runtime.
 # 启用线程局部分配块，并允许JVM在运行时自动调整它们的大小
--XX:+UseTLAB
--XX:+ResizeTLAB
+# TLAB Thread Local Allocation Buffer，JDK1.7默认开启TLAB一般不需要去设置，TLAB极大提高程序性能，它是Java的一个优化方案
+-XX:+UseTLAB		# 开启TLAB
+-XX:+ResizeTLAB		# 自调整TLABRefillWasteFraction 阀值
 -XX:+UseNUMA
 
 # http://www.evanjones.ca/jvm-mmap-pause.html
+# 减少高IO时的JVM停顿，原理请见http://www.evanjones.ca/jvm-mmap-pause.html
 -XX:+PerfDisableSharedMem
 
 # Prefer binding to IPv4 network intefaces (when net.ipv6.bindv6only=1). See
 # http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6342561 (short version:
 # comment out this entry to enable IPv6 support).
+# 首选绑定到IPv4网络接口（当net.ipv6.bindv6only = 1时），注释掉此条目可启用IPv6支持
+# 详情请参阅http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6342561
 -Djava.net.preferIPv4Stack=true
 
 ### Debug options
