@@ -175,7 +175,7 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 # TLAB Thread Local Allocation Buffer，JDK1.7默认开启TLAB一般不需要去设置，TLAB极大提高程序性能，它是Java的一个优化方案
 -XX:+UseTLAB		# 开启TLAB
 -XX:+ResizeTLAB		# 自调整TLABRefillWasteFraction 阀值
--XX:+UseNUMA
+-XX:+UseNUMA        # 使用NUMA开启性能优化，默认不开启，该项只有在开启了-XX:+UseParallelGC后才有效
 
 # http://www.evanjones.ca/jvm-mmap-pause.html
 # 减少高IO时的JVM停顿，原理请见http://www.evanjones.ca/jvm-mmap-pause.html
@@ -191,10 +191,13 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 ### Debug options
 
 # uncomment to enable flight recorder
+# 取消注释以启用飞行记录器（这两个选项要一起使用）
+# Java飞行记录器（JFR）会收集Java应用程序以及Java VM的行为信息。JFR构建在了Java VM之中，能够为用户提供运行时的信息。使用JFR并不会影响其他的Java VM优化，它的最小开销会小于2%
 #-XX:+UnlockCommercialFeatures
 #-XX:+FlightRecorder
 
 # uncomment to have Cassandra JVM listen for remote debuggers/profilers on port 1414
+# 取消注释让Cassandra JVM在端口1414上侦听远程调试器/分析器？？？
 #-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1414
 
 # uncomment to have Cassandra JVM log internal method compilation (developers only)
