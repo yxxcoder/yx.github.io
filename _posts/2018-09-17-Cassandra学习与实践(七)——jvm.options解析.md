@@ -197,10 +197,12 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 #-XX:+FlightRecorder
 
 # uncomment to have Cassandra JVM listen for remote debuggers/profilers on port 1414
-# 取消注释让Cassandra JVM在端口1414上侦听远程调试器/分析器？？？
+# 取消注释让Cassandra JVM在端口1414上侦听远程调试器/分析器 ???
+# -agentlib:libname[=options] 这个命令加载指定的native agent库。理论上这条option出现后，JVM会到本地固定路径下LD_LIBRARY_PATH这里加载名字为libxxx.so的库。而这样的库理论上是JVM TI的功能，具体可以参考JVM TI规范
 #-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1414
 
 # uncomment to have Cassandra JVM log internal method compilation (developers only)
+# -XX:+LogCompilation开启编译时日志输出，在编译时会有一个hotspot.log的日志输出到当前工作目录下。可以用-XX:LogFile指定不同的目录。默认这个参数是关闭的，即编译日志不输出。这个参数需要和-XX:UnlockDiagnosticVMOptions一起使用。也可以使用-XX:+PrintCompilation选项在控制台打印编译过程信息
 #-XX:+UnlockDiagnosticVMOptions
 #-XX:+LogCompilation
 
@@ -209,6 +211,7 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 #################
 
 # Heap size is automatically calculated by cassandra-env based on this
+# 堆大小由cassandra-env.sh 脚本根据操作系统内存自动计算，规则如下
 # formula: max(min(1/2 ram, 1024MB), min(1/4 ram, 8GB))
 # That is:
 # - calculate 1/2 ram and cap to 1024MB
@@ -218,16 +221,20 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 # For production use you may wish to adjust this for your environment.
 # If that's the case, uncomment the -Xmx and Xms options below to override the
 # automatic calculation of JVM heap memory.
-#
+# 对于生产环境，希望您可以根据环境调整
+# 如果是这种情况，请取消注释下面的-Xmx和Xms选项以覆盖JVM堆内存的自动计算
+# 
 # It is recommended to set min (-Xms) and max (-Xmx) heap sizes to
 # the same value to avoid stop-the-world GC pauses during resize, and
 # so that we can lock the heap in memory on startup to prevent any
 # of it from being swapped out.
+# 建议将 min (-Xms) 和 max (-Xmx) 堆大小设置为相同的值，以避免在调整大小期间GC暂停stop-the-world，所以我们可以在启动时就锁定内存中将来要使用到部分，防止任何内容被换出
 #-Xms4G
 #-Xmx4G
 
 # Young generation size is automatically calculated by cassandra-env
 # based on this formula: min(100 * num_cores, 1/4 * heap size)
+# 年轻代大小由cassandra-env.sh 脚本根据以下公式自动计算：min(100 * num_cores, 1/4 * heap size)
 #
 # The main trade-off for the young generation is that the larger it
 # is, the longer GC pause times will be. The shorter it is, the more
