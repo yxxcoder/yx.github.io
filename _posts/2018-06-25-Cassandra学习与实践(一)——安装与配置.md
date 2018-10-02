@@ -136,3 +136,45 @@ JVM级别的设置（如堆大小）可以在`cassandra-env.sh`中设置，可�
 #### 日志
 
 Cassandra使用的日志框架是logback，可以通过编辑`logback.xml`来更改日志记录属性。默认情况下，将`INFO`级别日志写入`system.log`文件，将`DEBUG`级别日志写入`debug.log`文件中。在前台运行时，还会将`INFO`级别日志输出到控制台
+
+<br>
+
+##  Cassandra数据库迁移
+#### 方法一：copy命令
+
+此方法适用于数据量小的情况下
+
+使用如下命令：
+
+```shell
+copy mykeyspace.mytable to ‘/home/db.csv’
+```
+
+这样就成功的把表`mytable`以csv的格式导出到了`db.csv`文件
+
+然后再另外一个集群中，建一个一模一样的表，然后使用命令：
+
+```shell
+copy mykeyspace.mytable from ‘/home/db.csv’
+```
+
+就把数据导入到了新的库中
+
+不过以上方式仅限于小数据量，当数据量一大，这个过程会持续很久，而且文件也会很大
+
+<br>
+
+#### 方法二：sstableloader工具
+
+在cassandra的bin目录下提供了一个sstableloader工具，这个工具专门用于把一个表的sstable文件导入到一个新的集群中。假设你的表是mykeyspace.mytable。你的数据存一个10个节点组成的集群中，每个几点的数据都存在/disk/data1和/disk/data2目录下。假设你的新集群的一个访问地址是IP， 先在新集群建相同名字的keyspace和表结构。接下来你只要在老集群的每个节点执行下面的命令：
+
+```shell
+bin/sstableloader -d IP -u cassandra -pw cassandra -t 100 /disk/data1/mykeyspace/mytable
+
+bin/sstableloader -d IP -u cassandra -pw cassandra -t 100 /disk/data2/mykeyspace/mytable
+```
+
+其中-u是 用户名 -pw是密码 -t是限制流量100M/bps
+
+等所有节点执行完毕，你的表数据就成功导入到了新的集群中，当然只要你的机器io和网络条件允许，你可以多个节点并发执行
+
