@@ -8,10 +8,9 @@ categories: nosql
 #### *参考资料*
 
 - *极客学院 [http://www.jikexueyuan.com](http://www.jikexueyuan.com)*
-
 - *Cassandra官方文档 [http://cassandra.apache.org/doc/latest/faq/index.html](http://cassandra.apache.org/doc/latest/faq/index.html)*
-
 - *学习Cassandra [https://teddyma.gitbooks.io/learncassandra_cn/content/](https://teddyma.gitbooks.io/learncassandra_cn/content/)*
+- *Cassandra读写过程 [https://zhuanlan.zhihu.com/p/30498475](https://zhuanlan.zhihu.com/p/30498475)*
 
 
 <br>
@@ -46,7 +45,7 @@ Cluster cluster = Cluster
 
 ### Load Balancing Policies
 
-默认情况下，一个客户端的Cluster实例管理了集群中所有节点的连接，并且，将客户端请求随机连接到任意节点。不过，在某些情况下，尤其是多数据中心时，默认行为的性能可能不是最优的
+默认情况下，一个客户端的Cluster实例管理了集群中所有节点的连接，并且，将客户端请求**随机连接到任意节点**。不过，在某些情况下，尤其是多数据中心时，默认行为的性能可能不是最优的
 
 例如，如果集群包含两个数据中心，一个在中国，一个在美国。如果客户端在中国，那么，应该避免直接连接美国的节点，不然太慢
 
@@ -55,6 +54,12 @@ Cluster实例的Load balancing policies设置，决定了，客户端请求如�
 Datastax driver中最常用的内置Load balancing policies是`DCAwareLoadBalancePolicy`，它可以指定客户端请求只连接到指定的数据中心的节点
 
 当然，也可以实现自定义的load balanacing policies，实现自定义的客户端连接分配
+
+<br>
+
+### 协调者（Coodinator）
+
+当一个客户端连接一个节点并发出读写请求时，这个节点就是协调者。协调者的作用就像客户端和集群节点之间的代理一样。协调者在基于[分区器配置](https://yxxcoder.github.io/nosql/2018/08/22/Cassandra%E5%AD%A6%E4%B9%A0%E4%B8%8E%E5%AE%9E%E8%B7%B5(%E4%B8%89)-%E6%9E%B6%E6%9E%84%E7%BB%84%E5%BB%BA.html)和[副本策略](https://yxxcoder.github.io/nosql/2018/07/03/Cassandra%E5%AD%A6%E4%B9%A0%E4%B8%8E%E5%AE%9E%E8%B7%B5(%E5%9B%9B)-%E6%95%B0%E6%8D%AEReplication.html)的情况下决定环中的哪个节点会得到请求
 
 <br>
 
@@ -71,6 +76,22 @@ Datastax driver中最常用的内置Load balancing policies是`DCAwareLoadBalanc
 如果使用consistency level ONE或者LOCAL_QUORUM，coordinator只需要和本地数据中心的节点通信。因此，可以避免，跨数据中心的的通信影响写操作性能
 
 ![column](https://yxxcoder.github.io/images/双数据中心.png)
+
+<br>
+
+### 写失败时，Hinted Handoff
+
+有时，因为硬件，网络，或因为经历长时间的垃圾回收暂停导致的超载，节点无法回应。Hinted handoff可以允许在集群容量减小的情况下继续执行写请求
+
+在检测到节点down，错过的写请求会在一段时间内存到协调者中，如果在cassandra.yaml文件中开启了hinted handoff。在DataStax5.0后面的版本中，hint存在一个hints的目录中。Hint包含了，down节点的target ID，一个Hint ID（即是一个time UUID），一个message ID（DataStax Enterprise的版本），和数据（blob存储）
+
+Hints每10秒写一次磁盘，避免hints过时。当gossip发现节点恢复时，协调者把保存的写请求线索里的数据写进去，然后删除hint文件。如果一个节点down掉3个小时以上（默认值），协调者不再写入新的hints
+
+协调者会每10分钟检查写hints，可能由于短时间的停电超时以至于gossip没有监测到。如果一个副本超载或者不可用，failure detector还不会把节点标记成down，直到大多数或全部写到那个节点时超时触发失败（默认10秒）。协调者会返回一个TimeOutException异常，写失败了但是hint会被存下来。如果几个节点同时断电，会造成协调者大量的内存压力。协调者追踪有多少hints，如果实在太多，协调者拒绝写，并抛出OverloadedException
+<br>
+### coordinator挂掉怎么办？
+
+一致性级别会影响hints是否会被写入和后续写请求会不会失败。一个集群有两个节点A和B，RF=1，CL=ONE，每一个行都只存在一个节点中。假设A是协调者，但是在row K写入前down，这种情况，不会满足一致性，因为A是协调者，它不能存hint了。B也不能写数据，因为没有接受到协调者发来的数据也没有hint存下来。协调者检查在线副本数量，如果客户端指定的一致性不能满足不会尝试写hint。一个hinted handoff 错误发生，返回UnavailableException异常。写请求失败，hint没有被写入
 
 <br>
 
@@ -118,6 +139,6 @@ Datastax driver中最常用的内置Load balancing policies是`DCAwareLoadBalanc
 
 ### 使用speculative_retry做快速读保护（Rapid read protection）
 
-快速读保护允许，即使coordinator最开始选择的replica节点down了或者超时了，依然能返回数据。如果一个表配置了speculative_retry参数，假如coordinator最先选择的replica读取超时，coordinator会尝试读取其他可用的replica代替
+快速读保护允许coordinator最开始选择的replica节点down了或者超时了，依然能返回数据。如果一个表配置了speculative_retry参数，假如coordinator最先选择的replica读取超时，coordinator会尝试读取其他可用的replica代替
 
 ![column](https://yxxcoder.github.io/images/rapidReadProtection.svg)
