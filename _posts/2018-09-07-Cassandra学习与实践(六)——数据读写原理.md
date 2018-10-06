@@ -93,9 +93,29 @@ Hints每10秒写一次磁盘，避免hints过时。当gossip发现节点恢复�
 
 一致性级别会影响hints是否会被写入和后续写请求会不会失败。一个集群有两个节点A和B，RF=1，CL=ONE，每一个行都只存在一个节点中。假设A是协调者，但是在row K写入前down，这种情况，不会满足一致性，因为A是协调者，它不能存hint了。B也不能写数据，因为没有接受到协调者发来的数据也没有hint存下来。协调者检查在线副本数量，如果客户端指定的一致性不能满足不会尝试写hint。一个hinted handoff 错误发生，返回UnavailableException异常。写请求失败，hint没有被写入
 
-通常来说，建议有集群有足够的节点，和足够的RF避免写请求失败。比如一个集群有3个节点A,B,C，RF=2。当row K写入协调者A时，即使down，CL=ONE或者CL=QUORUM也是可以满足的。因为A和B都会接受数据,所以一致性满足。A节点会存储C的hint当C恢复时写入
+通常来说，建议有集群有足够的节点，和足够的RF避免写请求失败。比如一个集群有3个节点A,B,C，RF=2。当row K写入协调者A时，即使down，CL=ONE或者CL=QUORUM也是可以满足的。因为A和B都会接受数据，所以一致性满足。A节点会存储C的hint当C恢复时写入
 
 在非分布式架构中，客户端请求并得到回复如图：
+
+![column](https://yxxcoder.github.io/images/req_and_resp.jpg)
+
+如果在服务器回复前挂掉了，客户端不知道发生了什么，只有当服务器重新上线后重发请求
+
+![column](https://yxxcoder.github.io/images/request.jpg)
+
+客户端可能会连接集群里的任一节点，不管它是不是要读数据的那个节点，叫协调者。它负责路由客户端请求到合适的副本集
+
+如果协调者在途中挂了，和非分布式架构一样，客户端也只能重试。不同的是客户端可以**立马连接集群里别的节点**
+
+![column](https://yxxcoder.github.io/images/request_coordinator.jpg)
+
+如果是副本挂了，协调者没有。有两种情况，第一种是协调者failure detector在请求之前知道副本挂了，所以它都不会再把请求路由到那个节点上面。相反，它立刻回复客户端一个UnavilableException。这是Cassandra唯一会写失败的时候（当太少的副本集在线时，协调者收到了请求，这是唯一会写失败的时候）
+
+![column](https://yxxcoder.github.io/images/request_and_replica_fail.jpg)
+
+如果协调者收到了请求，在发送给副本的时候挂了，协调者返回一个TimedOutException。读写更新这些超时时间可以配置。超时不是失败。协调者把这个操作更新在本地，然后记录在hint里，当副本重新上线时再发给它。这是强制更新后处理（post-update）
+
+![column](https://yxxcoder.github.io/images/request_and_replica_timeout.jpg)
 
 <br>
 

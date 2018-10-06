@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Cassandra学习与实践(三)——架构组建"
-date:   2018-08-22 22:00:00 +0800
+date:   2018-06-30 22:00:00 +0800
 categories: nosql
 ---
 
