@@ -279,9 +279,9 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 
 ### CMS Settings
 
-# 支持在年轻代用多线程进行垃圾收集。默认不开启，使用-XX:+UseConcMarkSweepGC时会自动被开启
+# 支持在年轻代用多线程进行垃圾收集。默认不开启，使用[-XX:+UseConcMarkSweepGC]时会自动被开启
 -XX:+UseParNewGC
-# 设置让CMS也支持老年代的回收。默认是不开启的，如果开启，那么-XX:+UseParNewGC也会自动被设置。Java 8 不支持-XX:+UseConcMarkSweepGC -XX:-UseParNewGC这种组合
+# 设置让CMS也支持老年代的回收。默认是不开启的，如果开启，那么[-XX:+UseParNewGC]也会自动被设置。Java 8 不支持[-XX:+UseConcMarkSweepGC -XX:-UseParNewGC]这种组合
 -XX:+UseConcMarkSweepGC
 # 开启并行remark，降低标记停顿
 -XX:+CMSParallelRemarkEnabled
@@ -292,10 +292,10 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 # 设置一个年老代的占比，达到多少会触发CMS回收。默认是-1，任何一个负值的设定都表示了用-XX:CMSTriggerRatio来做真实的初始化值。
 -XX:CMSInitiatingOccupancyFraction=75
 # 设置使用占用值作为初始化CMS收集器的唯一条件。默认是不开启
-# 为了让-XX:CMSInitiatingOccupancyFraction生效，还要设置使用占用值作为初始化CMS收集器的唯一条件（默认是不开启的），否则75只被用来做开始的参考值，后面还是JVM自己算
+# 为了让[-XX:CMSInitiatingOccupancyFraction]生效，还要设置使用占用值作为初始化CMS收集器的唯一条件（默认是不开启的），否则75只被用来做开始的参考值，后面还是JVM自己算
 -XX:+UseCMSInitiatingOccupancyOnly
 # CMS 线程用于等待 Young GC 的时间，默认值是2000ms
-# 一旦CMS收集器被触发了，JVM会等待一段时间，让young gc完成后再开始inital mark。JVM配置参数-XX:CMSWaitDuration=可以用来配置CMS等待多长时间才开始inital mark。如果你不希望长时间的inital mark暂停，那么可以配置该选项，让等待时间略微长于你的应用中执行一次young gc所需要的时间
+# 一旦CMS收集器被触发了，JVM会等待一段时间，让young gc完成后再开始inital mark。JVM配置参数[-XX:CMSWaitDuration=]可以用来配置CMS等待多长时间才开始inital mark。如果你不希望长时间的inital mark暂停，那么可以配置该选项，让等待时间略微长于你的应用中执行一次young gc所需要的时间
 -XX:CMSWaitDuration=10000
 # CMS GC的initmark阶段默认是单线程标记的，此参数开启多个GC线程并行初始标记，进一步提升初始化标记效率
 -XX:+CMSParallelInitialMarkEnabled
@@ -306,43 +306,64 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 -XX:+CMSClassUnloadingEnabled
 
 ### G1 Settings (experimental, comment previous section and uncomment section below to enable)
+### G1 设置（实验性的，注释上一部分，取消注释下面部分以启用） 
 
 ## Use the Hotspot garbage-first collector.
+## 启用Hotspot的G1 GC
 #-XX:+UseG1GC
 #
 ## Have the JVM do less remembered set work during STW, instead
 ## preferring concurrent GC. Reduces p99.9 latency.
+## G1 GC通过为每个分区维护RememberSet来记录分区外对分区内的引用，[G1RSetUpdatingPauseTimePercent]则正是在STW阶段为G1收集器指定更新RememberSet的时间占总STW时间的期望比例，默认为10。减小该值可以把STW阶段的RememberSet更新工作压力更多地移到Concurrent阶段
 #-XX:G1RSetUpdatingPauseTimePercent=5
 #
 ## Main G1GC tunable: lowering the pause target will lower throughput and vise versa.
 ## 200ms is the JVM default and lowest viable setting
 ## 1000ms increases throughput. Keep it smaller than the timeouts in cassandra.yaml.
+## 设置一个最大的GC停顿时间（毫秒），这是个软目标，JVM会尽最大努力去实现它
+## 主要G1GC可调的：降低停顿时间将降低吞吐量，反之亦然。200ms是JVM默认设置和最低可行设置，1000ms增加了吞吐量。保持小于cassandra.yaml中的超时。
 #-XX:MaxGCPauseMillis=500
 
+
 ## Optional G1 Settings
+## 可选G1设置
 
 # Save CPU time on large (>= 16GB) heaps by delaying region scanning
 # until the heap is 70% full. The default in Hotspot 8u40 is 40%.
+# 设置触发标记周期的 Java 堆占用率阈值
+# 通过延迟区域扫描，将CPU时间节省在大（> = 16GB）堆上直到堆满70％。Hotspot 8u40的默认值为40％
 #-XX:InitiatingHeapOccupancyPercent=70
 
 # For systems with > 8 cores, the default ParallelGCThreads is 5/8 the number of logical cores.
 # Otherwise equal to the number of cores when 8 or less.
 # Machines with > 10 cores should try setting these to <= full cores.
+# STW工作线程数的值，对于具有 > 8个内核的系统，默认的[ParallelGCThreads]是逻辑内核数量的5/8。否则等于8或更少的核心数。具有 > 10个核心的计算机应尝试将这些设置为<=完整核心
 #-XX:ParallelGCThreads=16
 # By default, ConcGCThreads is 1/4 of ParallelGCThreads.
 # Setting both to the same value can reduce STW durations.
+# 默认情况下，[ConcGCThreads]是[ParallelGCThreads]的1/4。将两者设置为相同的值可以减少STW持续时间
 #-XX:ConcGCThreads=16
 
 ### GC logging options -- uncomment to enable
+### GC日志记录选项 -- 取消注释以启用
 
+# 输出GC的详细日志，只要设置-XX:+PrintGCDetails 就会自动带上-verbose:gc和-XX:+PrintGC
 -XX:+PrintGCDetails
+# 输出gc的触发时间，以日期的形式，如 2013-05-04T21:53:59.234+0800
 -XX:+PrintGCDateStamps
+# 在进行GC的前后打印出堆的信息
 -XX:+PrintHeapAtGC
+# JVM 中的一个对象新被创建时 age 是 0; 之后每次 Minor GC 后, 这个对象如果还在新生代中, 这个对象的 age 数加一。[PrintTenuringDistribution]指定在每次新生代GC时，输出幸存区中对象的年龄分布
 -XX:+PrintTenuringDistribution
+# 把全部的JVM停顿时间（不只是GC），打印在GC日志里
 -XX:+PrintGCApplicationStoppedTime
+# 打开了就知道是多大的新生代对象晋升到老生代失败从而引发Full GC时的
 -XX:+PrintPromotionFailure
+# 打印FreeListSpace的统计信息，可以得到内存碎片的信息，添加[-XX:PrintFLSStatistics=1]参数来打印每次gc前后的Heap余量。较大的余量，可以怀疑Heap中存在内存碎片过多
 #-XX:PrintFLSStatistics=1
+# 设置gc日志文件，gc相关信息会重定向到该文件。这个配置如果和[-verbose:gc]同时出现，会覆盖[-verbose:gc]参数
 #-Xloggc:/var/log/cassandra/gc.log
+# GC日志默认会在重启后清空，有人担心长期运行的应用会把文件弄得很大，所以[-XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=1M]的参数可以让日志滚动起来
 -XX:+UseGCLogFileRotation
 -XX:NumberOfGCLogFiles=10
 -XX:GCLogFileSize=10M
