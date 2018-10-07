@@ -239,26 +239,39 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 # The main trade-off for the young generation is that the larger it
 # is, the longer GC pause times will be. The shorter it is, the more
 # expensive GC will be (usually).
+# 年轻代的主要权衡是: 年轻代越大，GC停顿时间越长，年轻代越小，GC就越昂贵（通常情况下）
 #
 # It is not recommended to set the young generation size if using the
 # G1 GC, since that will override the target pause-time goal.
 # More info: http://www.oracle.com/technetwork/articles/java/g1gc-1984535.html
+# 如果使用G1 GC，则不建议设置年轻代大小，因为这将覆盖其暂停的时间目标。
+# 更多信息：http：//www.oracle.com/technetwork/articles/java/g1gc-1984535.html
 #
 # The example below assumes a modern 8-core+ machine for decent
 # times. If in doubt, and if you do not particularly want to tweak, go
 # 100 MB per physical CPU core.
+# 下面的例子假设现代的8核+机器适合的大小。如果有疑问，或者如果不想特别调整，请为每个物理CPU核心提供100MB
 #-Xmn800M
+
 
 ###################################
 # EXPIRATION DATE OVERFLOW POLICY #
 ###################################
 
 # Defines how to handle INSERT requests with TTL exceeding the maximum supported expiration date:
+# 定义如何处理TTL超过支持的最大到期日期的INSERT请求：
+
 # * REJECT: this is the default policy and will reject any requests with expiration date timestamp after 2038-01-19T03:14:06+00:00.
+# * REJECT: 这是默认策略，将拒绝在2038-01 19T03：14：06 + 00:00之后任何带有到期日期时间戳的请求
+
 # * CAP: any insert with TTL expiring after 2038-01-19T03:14:06+00:00 will expire on 2038-01-19T03:14:06+00:00 and the client will receive a warning.
+# * CAP: 在2038-01-19T03：14：06 + 00:00之后TTL到期的任何插入请求将在2038-01-19T03：14：06 + 00:00过期，同时客户端将收到警告
+
 # * CAP_NOWARN: same as previous, except that the client warning will not be emitted.
+# * CAP_NOWARN: 与上一个相同，但不会发出客户端警告
 #
 #-Dcassandra.expiration_date_overflow_policy=REJECT
+
 
 #################
 #  GC SETTINGS  #
@@ -266,17 +279,30 @@ Cassandra的JVM配置可以在`jvm.options`配置文件中设置，当Cassandra�
 
 ### CMS Settings
 
+# 支持在年轻代用多线程进行垃圾收集。默认不开启，使用-XX:+UseConcMarkSweepGC时会自动被开启
 -XX:+UseParNewGC
+# 设置让CMS也支持老年代的回收。默认是不开启的，如果开启，那么-XX:+UseParNewGC也会自动被设置。Java 8 不支持-XX:+UseConcMarkSweepGC -XX:-UseParNewGC这种组合
 -XX:+UseConcMarkSweepGC
+# 开启并行remark，降低标记停顿
 -XX:+CMSParallelRemarkEnabled
+# Eden区和Survivor区的大小比值，默认是32。调小这个参数将增大survivor区，让对象尽量在survitor区呆长一点，减少进入年老代的对象
 -XX:SurvivorRatio=8
+# 对象在Survivor区熬过多少次Young GC后晋升到年老代，CMS默认是6
 -XX:MaxTenuringThreshold=1
+# 设置一个年老代的占比，达到多少会触发CMS回收。默认是-1，任何一个负值的设定都表示了用-XX:CMSTriggerRatio来做真实的初始化值。
 -XX:CMSInitiatingOccupancyFraction=75
+# 设置使用占用值作为初始化CMS收集器的唯一条件。默认是不开启
+# 为了让-XX:CMSInitiatingOccupancyFraction生效，还要设置使用占用值作为初始化CMS收集器的唯一条件（默认是不开启的），否则75只被用来做开始的参考值，后面还是JVM自己算
 -XX:+UseCMSInitiatingOccupancyOnly
+# CMS 线程用于等待 Young GC 的时间，默认值是2000ms
+# 一旦CMS收集器被触发了，JVM会等待一段时间，让young gc完成后再开始inital mark。JVM配置参数-XX:CMSWaitDuration=可以用来配置CMS等待多长时间才开始inital mark。如果你不希望长时间的inital mark暂停，那么可以配置该选项，让等待时间略微长于你的应用中执行一次young gc所需要的时间
 -XX:CMSWaitDuration=10000
+# CMS GC的initmark阶段默认是单线程标记的，此参数开启多个GC线程并行初始标记，进一步提升初始化标记效率
 -XX:+CMSParallelInitialMarkEnabled
+# 对于Eden区总是使用并行的执行Inital mark和Remark
 -XX:+CMSEdenChunksRecordAlways
 # some JVMs will fill up their heap when accessed via JMX, see CASSANDRA-6541
+# 这个参数表示在使用CMS垃圾回收机制的时候是否启用类卸载功能。默认这个是设置为不启用的，如果启用了CMSClassUnloadingEnabled ，垃圾回收会清理持久代，移除不再使用的classes。这个参数只有在[UseConcMarkSweepGC]也启用的情况下才有用
 -XX:+CMSClassUnloadingEnabled
 
 ### G1 Settings (experimental, comment previous section and uncomment section below to enable)
