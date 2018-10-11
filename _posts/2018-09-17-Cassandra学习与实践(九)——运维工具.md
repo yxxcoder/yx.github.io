@@ -15,3 +15,15 @@ categories: nosql
 
 <br>
 
+
+
+- nodetool version
+
+  显示当前Cassandra的版本信息
+
+- nodetool status
+
+  显示当前机器节点信息（UN正常，DN宕机）、数据中心、机架信息
+
+  ​
+
