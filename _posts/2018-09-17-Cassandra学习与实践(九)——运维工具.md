@@ -25,5 +25,7 @@ categories: nosql
 
   显示当前机器节点信息（UN正常，DN宕机）、数据中心、机架信息
 
-  ​
+- nodetool netstats
+
+  获取节点的网络连接信息，可以指定参数 -h 查看具体节点信息
 
