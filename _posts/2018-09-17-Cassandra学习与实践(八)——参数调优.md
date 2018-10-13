@@ -10,8 +10,60 @@ categories: nosql
 - *Cassandra官方文档 [http://cassandra.apache.org/doc/latest/faq/index.html](http://cassandra.apache.org/doc/latest/faq/index.html)*
 
 
+<br>
+
+
+
+## Linux优化
+
+### 1. 安装 jemalloc
+
+jemalloc是一个在内存分配上比linux自带的malloc(ptmalloc)要优秀的分配工具
+
+Github地址：<https://github.com/jemalloc/jemalloc>
+
+下载后安装：
+
+```shell
+tar xjf jemalloc-3.6.0.tar.bz2
+cd jemalloc-3.6.0
+./configure
+make &&make install
+echo '/usr/local/lib'>/etc/ld.so.conf.d/local.conf
+ldconfig
+```
 
 <br>
+
+### 2. 关闭swap
+
+/etc/sysctl.conf
+
+```shell
+vm.max_map_count = 131072
+#最大限度使用物理内存
+vm.swappiness = 0
+```
+
+使之生效
+
+```shell
+sysctl -p
+swapoff -a
+```
+
+<br>
+
+永久关闭swap：
+
+```shell
+vim /etc/fstab
+# 注释掉swap分区项
+```
+
+
+
+
 
 ## Cassandra性能调优
 
