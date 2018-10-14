@@ -35,37 +35,71 @@ ldconfig
 
 <br>
 
-### 2. 关闭swap
+### 2. 调整系统参数
 
 /etc/sysctl.conf
 
 ```shell
-vm.max_map_count = 131072
+# 调大mmap限制
+vm.max_map_count = 1048575
 #最大限度使用物理内存
 vm.swappiness = 0
+# 调整keepalive
+net.ipv4.tcp_keepalive_time=60 
+net.ipv4.tcp_keepalive_intvl=60 
+net.ipv4.tcp_keepalive_probes=5
+# 提升网络性能
+net.core.rmem_max=16777216
+net.core.wmem_max=16777216
+net.core.rmem_default=16777216
+net.core.wmem_default=16777216
+net.core.optmem_max=40960
+net.ipv4.tcp_rmem=4096 87380 16777216
+net.ipv4.tcp_wmem=4096 65536 16777216
 ```
 
 使之生效
 
 ```shell
-sysctl -p
-swapoff -a
+sudo sysctl -p
+# 关闭swap
+sudo swapoff --all
 ```
 
-<br>
-
-永久关闭swap：
+若永久关闭swap：
 
 ```shell
 vim /etc/fstab
 # 注释掉swap分区项
 ```
 
+<br>
 
+分别使用root用户和cassandra用户执行如下命令：
 
+```shell
+# max locked-in-memory address space (KB)
+ulimit -l unlimited
+# max number of open files
+ulimit -n 100000
+# max number of processes
+ulimit -u 32768
+# address space limit (KB)
+ulimit -v 32768
+```
 
+若永久保存，请将如下参数添加到/etc/security/limits.conf 文件：
 
-## Cassandra性能调优
+```shell
+<cassandra_user> - memlock unlimited
+<cassandra_user> - nofile 100000
+<cassandra_user> - nproc 32768
+<cassandra_user> - as unlimited
+```
+
+<br>
+
+## Cassandra参数调优
 
 - memtable_allocation_type
 
