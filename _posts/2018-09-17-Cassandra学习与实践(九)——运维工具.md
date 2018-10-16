@@ -21,6 +21,14 @@ categories: nosql
 
   显示当前Cassandra的版本信息
 
+- nodetool describecluster
+
+  用于描述集群信息
+
+- nodetool describering
+
+   后面跟keyspace名字，显示圆环的节点信息
+
 - nodetool status
 
   显示当前机器节点信息（UN正常，DN宕机）、数据中心、机架信息
