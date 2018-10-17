@@ -48,3 +48,7 @@ categories: nosql
 - nodetool cfstats 
 
   查看表的一些信息，包括读的次数，写的次数，sstable数量，Memtable信息，压缩信息，bloomfilter信息。使用-H 则文件的信息会以可读的方式
+
+- nodetool compactionstats 
+
+  显示当前压缩信息
