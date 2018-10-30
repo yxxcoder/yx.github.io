@@ -19,7 +19,7 @@ categories: nosql
 
 ### Background Image Plus
 
-装备B插件
+装备B插件，设置IDE背景图片
 
 ### Markdown support
 
