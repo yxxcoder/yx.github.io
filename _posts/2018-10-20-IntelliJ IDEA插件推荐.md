@@ -48,3 +48,4 @@ categories: nosql
 ### restfultookit
 
 要找到/book/add 对应的controller,那么只要cmd+斜杠，能后根据我们的controller帮我们生成默认的测试数据，还能直接调用测试
+
