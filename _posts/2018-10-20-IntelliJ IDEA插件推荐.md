@@ -19,7 +19,7 @@ Key Promoter X 是一个快捷键提示插件，当你在IDEA里面使用鼠标�
 
 ### Background Image Plus
 
-装备B插件，设置IDE背景图片
+一款可以设置idea背景图片的插件，不但可以设置固体的图片，还可以设置一段时间后随机变化背景图片，以及设置图片的透明度等等
 
 ### Markdown support
 
@@ -39,7 +39,7 @@ Key Promoter X 是一个快捷键提示插件，当你在IDEA里面使用鼠标�
 
 ### JRebel for IntelliJ
 
-热部署
+一款热部署插件，只要不是修改了项目的配置文件，用它都可以实现热部署。收费的，破解比较麻烦。不过功能确实很强大。算是开发必备神器了。热部署快捷键是control+F9/command+F9
 
 ### MyBatis Log Plugin
 
