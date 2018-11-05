@@ -9,6 +9,8 @@ categories: nosql
 
 AceJump是一款能够代替鼠标的软件，只要安装了这款插件，可以在代码中跳转到任意位置。按快捷键进入 AceJump 模式后（默认是 Ctrl+J），再按任一个字符，插件就会在屏幕中这个字符的所有出现位置都打上标签，你只要再按一下标签的字符，就能把光标移到该位置上
 
+![column](https://yxxcoder.github.io/images/AceJump.png)
+
 ### Key promoter X
 
 Key Promoter X 是一个快捷键提示插件，当你在IDEA里面使用鼠标的时候，如果这个鼠标操作是能够用快捷键替代的，那么Key Promoter X会弹出一个提示框，告知你这个鼠标操作可以用什么快捷键替代
@@ -16,6 +18,8 @@ Key Promoter X 是一个快捷键提示插件，当你在IDEA里面使用鼠标�
 ### activate-power-mode OR Power mode II
 
 装X必用，感受**power**
+
+![column](https://yxxcoder.github.io/images/activate-power-mode.gif)
 
 ### Background Image Plus
 
